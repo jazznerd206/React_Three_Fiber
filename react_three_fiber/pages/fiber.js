@@ -1,5 +1,5 @@
 import { useRef, useState, useEffect } from 'react';
-import { useFrame } from 'react-three-fiber';
+import { useFrame, useLoader } from 'react-three-fiber';
 import * as THREE from '../node_modules/three';
 
 export function Numbers() {
@@ -95,10 +95,12 @@ export function Light({ brightness, color }) {
 
 // Geometry
 export function GroundPlane() {
+    const texture = useLoader(THREE.TextureLoader, '/Heatmap.jpg');
+    console.log('texture ', texture)
     return (
       <mesh receiveShadow rotation={[5, 0, 0]} position={[0, -1, -7]}>
-        <planeBufferGeometry attach="geometry" args={[500, 500]} />
-        <meshStandardMaterial attach="material" color="radial-gradient(rgb(255,255,255.25), silver)" />
+        <planeBufferGeometry attach="geometry" args={[3, 3]} />
+        <meshStandardMaterial attach="material" color="radial-gradient(silver, rgb(255,255,255.25))" map={texture}/>
       </mesh>
     );
   }
