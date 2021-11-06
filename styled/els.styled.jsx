@@ -1,13 +1,22 @@
 import styled from 'styled-components';
 
+export const AppContainer = styled.div`
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex: 1;
+    height: 100%;
+    width: 100%;
+`
+
 export const Container = styled.div`
-display: flex;
-flex: 1;
-height: 100%;
-width: 100%;
+    margin: 0;
+    padding: 0;
+    background-color: black;
+    display: flex;
+    flex: 1;
+    height: 100vh;
+    width: 100vw;
     pointer-events: all;
-    position: absolute;
-    top: 0;
-    left: 0;
-    transform: translate3d(50px,50px,0);
+    z-index: -1;
 `

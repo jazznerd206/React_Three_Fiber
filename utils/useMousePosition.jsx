@@ -2,9 +2,17 @@ import { useEffect, useState } from "react";
 
 export const useMousePosition = () => {
   const [position, setPosition] = useState({ x: 0, y: 0 });
+  const [ raycaster, setRaycaster ] = useState({ x: 0, y: 0 });
 
   useEffect(() => {
-    const setFromEvent = (e) => setPosition({ x: e.clientX, y: e.clientY });
+    const setFromEvent = (e) => {
+      setPosition({ x: e.clientX, y: e.clientY });
+      setRaycaster({ 
+        x: (e.clientX / window.innerWidth) * 2 - 1,
+        y: (e.clientY / window.innerHeight) * 2 - 1
+      });
+    }
+
     window.addEventListener("mousemove", setFromEvent);
 
     return () => {
@@ -12,5 +20,5 @@ export const useMousePosition = () => {
     };
   }, []);
 
-  return position;
+  return { position, raycaster };
 };

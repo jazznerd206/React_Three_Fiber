@@ -1,17 +1,14 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { extend } from '@react-three/fiber';
-import ReactDOM from 'react-dom';
-import * as THREE from 'three'
-import { Canvas, useFrame, useLoader } from '@react-three/fiber';
+import * as THREE from 'three';
+import { useFrame, useLoader } from '@react-three/fiber';
 import golfBall from '../../public/images/golf_ball.jpeg';
 import { useSpring, animated } from '@react-spring/three';
-import useMeasure from 'react-use-measure';
 
 function GolfBall(props) {
 
     const mesh = useRef();
-    const [ active, setActive ] = useState(true)
-    const [ texture ] = useLoader(THREE.TextureLoader, [golfBall])
+    const [ active, setActive ] = useState(false);
+    const [ texture ] = useLoader(THREE.TextureLoader, [golfBall]);
 
     /**
      * ROTATE ANIMATION
@@ -28,9 +25,15 @@ function GolfBall(props) {
       })
     const scale = spring.to([0, 1], [1, 2])
     const rotation = spring.to([0, 1], [0, Math.PI])
-    const color = spring.to([0, 1], ['#6246ea', '#e45858'])
+    const color = spring.to([0, 1], ['#6246ea', '#e45858']);
 
-
+    function Dolly() {
+        useFrame((state) => {
+          state.camera.position.z = 50 + Math.sin(state.clock.getElapsedTime()) * 30
+          state.camera.updateProjectionMatrix()
+        })
+        return null
+    }
     
   
     return (            
@@ -41,20 +44,14 @@ function GolfBall(props) {
             scale-z={scale} 
             onClick={() => setActive(Number(!active))}
             >
+            {/* <pointLight position={[-10, 500, 100]} /> */}
             <mesh>
-                <sphereBufferGeometry attach="geometry" args={[1.25, 64, 64]} />
-                <meshStandardMaterial attach="material" map={texture} />
+                <sphereBufferGeometry attach="geometry" args={[2, 64, 64]} />
+                <meshStandardMaterial attach="material" map={texture}/>
             </mesh>
-            <mesh>
-                <sphereBufferGeometry attach="geometry" args={[1.25, 64, 64]} />
-                <meshStandardMaterial attach="material" map={texture} />
-            </mesh>
+            {/* <Dolly /> */}
         </animated.group>
       )
   }
 
 export default GolfBall;
-
-
-// {/* <rectAreaLight intensity={10} position={[10, 10, 10]} width={10} height={1000} onUpdate={(self) => self.lookAt(new THREE.Vector3(0, 0, 0))} />
-// <rectAreaLight intensity={10} position={[-10, -10, -10]} width={1000} height={10} onUpdate={(self) => self.lookAt(new THREE.Vector3(0, 0, 0))} /> */}
