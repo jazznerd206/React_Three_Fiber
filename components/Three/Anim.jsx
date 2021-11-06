@@ -76,7 +76,8 @@ function MeshAnim({
             t = update(t);
             return
         } else {
-            const positions = posRef.current.array, colors = colorRef.current.array
+            const positions = posRef.current.array
+            const colors = colorRef.current.array
     
             let i = 0
             for (let yi = 0; yi < height; yi++) {
@@ -130,11 +131,12 @@ function MeshAnim({
             </bufferGeometry>
             <meshStandardMaterial
                 vertexColors
+                // wireframe={true}
                 side={THREE.DoubleSide}
-                // map={texture}
-                // bumpMap={bump}
-                // bump={.75}
-                // bumpScale={.75}
+                attach="material"
+                map={texture}
+                bumpMap={bump}
+                bump={.25}
             />
         </mesh>
     );
@@ -180,9 +182,9 @@ export function Anim() {
             position={[0, -2, -2]}
             rotation={[-Math.PI / 2, 0, 0]}
             grid={{
-                width: 150,
-                height: 150,
-                dist: 0.2
+                width: 100,
+                height: 100,
+                dist: 1
             }}
             zOfXYT={zOfXYT}
             colorOfXYZT={colorOfXYZT}
