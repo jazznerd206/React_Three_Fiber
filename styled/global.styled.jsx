@@ -31,6 +31,7 @@ const GlobalStyle = createGlobalStyle`
     canvas {
         margin: 0;
         padding: 0;
+        pointer-events: all;
     }
 `;
  

@@ -1,12 +1,11 @@
-import React, { useMemo, useRef } from "react";
+import React, { useState, useEffect, useRef, useMemo } from 'react';
 import * as THREE from 'three';
-import { useFrame, useLoader } from '@react-three/fiber';
 import { usePlane } from '@react-three/cannon'
-import noise, { simplex3 } from '../../utils/noise.js';
-import grass from '../../public/images/grass_green_d.jpg';
-import grass_bump from '../../public/images/grass_green_n.jpg';
+import { useFrame, useLoader } from '@react-three/fiber';
+import noise, { perlin3 } from '../../utils/noise.js';
 
-function MeshAnim({
+
+function SkyAnim({
     position, 
     rotation,
     grid: {
@@ -19,12 +18,10 @@ function MeshAnim({
         previous,
         update
     }
-}) {
 
-    const [ texture, bump ] = useLoader(THREE.TextureLoader, [grass, grass_bump]);
-    const [plane] = usePlane((props) => ({ rotation: [-Math.PI / 2, 0, 0], ...props }))
-    let t = init // time
-    // previous = previous === undefined ? init : previous;
+}) {
+    let t = init;
+    const plane = useRef();
 
     // vertex buffer
     let { positions, colors, normals } = useMemo(() => {
@@ -49,7 +46,6 @@ function MeshAnim({
             normals: new Float32Array(normals)
         }
     }, [width, height, dist, zOfXYT, colorOfXYZT, t])
-
 
     // index buffer
     let indices = useMemo(() => {
@@ -95,15 +91,14 @@ function MeshAnim({
             colorRef.current.needsUpdate = true;
         }
     })
-
-
+    
     return (
         <mesh
             ref={plane}
             position={position}
             rotation={rotation}
         >
-            <bufferGeometry args={[8,8,64,64]}>
+            <bufferGeometry>
                 <bufferAttribute
                     ref={posRef}
                     attachObject={['attributes', 'position']}
@@ -132,22 +127,22 @@ function MeshAnim({
             </bufferGeometry>
             <meshStandardMaterial
                 vertexColors
-                // wireframe={true}
+                wireframe={false}
                 side={THREE.DoubleSide}
             />
         </mesh>
     );
 }
 
-export function Anim() {
+function Sky() {
 
     const seed = Math.floor(Math.random() * (2 ** 16))
     noise.seed(seed)
 
     const sampleNoise = (x, y, z) => {
-        let scale = 1 / 8
-        let octaves = 20
-        let persistence = .4
+        let scale = 1 / 16
+        let octaves = 10
+        let persistence = .8
         let lacunarity = 2
 
         let amp = 1
@@ -155,7 +150,7 @@ export function Anim() {
 
         let value = 0
         for (let i = 0; i < octaves; i++) {
-            value += amp * simplex3(x * freq * scale, y * freq * scale, z)
+            value += amp * perlin3(x * freq * scale, y * freq * scale, z)
             amp *= persistence
             freq *= lacunarity
         }
@@ -169,26 +164,76 @@ export function Anim() {
 
     const colorOfXYZT = (x,y,z,t) => {
         return {
-            r: z ** 2 / 32,
-            g: z * Math.sqrt(z ** 2 + y * y) / 15,
+            r: z,
+            g: z / 5,
             b: Math.sqrt(x ** 2 + y ** 2) / 75,
         }
     }
+
     return (
-        <MeshAnim 
-            position={[0, -2, -2]}
-            rotation={[-Math.PI / 2, 0, 0]}
-            grid={{
-                width: 100,
-                height: 100,
-                dist: .8
-            }}
-            zOfXYT={zOfXYT}
-            colorOfXYZT={colorOfXYZT}
-            anim={{
-                init: 0,
-                update: (t) => t + 0.002
-            }}
-        />
-    );
+        <>
+            <SkyAnim 
+                position={[0, 0, 50]}
+                rotation={[0, 0, 0]}
+                grid={{
+                    width: 25,
+                    height: 25,
+                    dist: 4
+                }}
+                zOfXYT={zOfXYT}
+                colorOfXYZT={colorOfXYZT}
+                anim={{
+                    init: 0,
+                    update: (t) => t + 0.002
+                }}
+            />
+            <SkyAnim 
+                position={[0, 0, -50]}
+                rotation={[0, 0, 0]}
+                grid={{
+                    width: 25,
+                    height: 25,
+                    dist: 4
+                }}
+                zOfXYT={zOfXYT}
+                colorOfXYZT={colorOfXYZT}
+                anim={{
+                    init: 0,
+                    update: (t) => t + 0.002
+                }}
+            />
+            <SkyAnim 
+                position={[-50, 0, 0]}
+                rotation={[0, -Math.PI / 2, 0]}
+                grid={{
+                    width: 25,
+                    height: 25,
+                    dist: 4
+                }}
+                zOfXYT={zOfXYT}
+                colorOfXYZT={colorOfXYZT}
+                anim={{
+                    init: 0,
+                    update: (t) => t + 0.002
+                }}
+            />
+            <SkyAnim 
+                position={[50, 0, 0]}
+                rotation={[0, -Math.PI / 2, 0]}
+                grid={{
+                    width: 25,
+                    height: 25,
+                    dist: 4
+                }}
+                zOfXYT={zOfXYT}
+                colorOfXYZT={colorOfXYZT}
+                anim={{
+                    init: 0,
+                    update: (t) => t + 0.002
+                }}
+            />
+        </>
+    )
 }
+
+export default Sky

@@ -1,36 +1,59 @@
 import React, { Suspense, useState, useEffect, useRef } from 'react';
-import * as THREE from 'three';
 import { RectAreaLightUniformsLib } from 'three/examples/jsm/lights/RectAreaLightUniformsLib'
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls";
-import { Canvas, useFrame, extend, useLoader } from '@react-three/fiber';
+import { Canvas, useThree, useFrame, extend } from '@react-three/fiber';
+import { Physics } from '@react-three/cannon'
 import GlobalStyle from './styled/global.styled.jsx';
 import { AppContainer, Container } from './styled/els.styled.jsx';
-import { Anim } from './components/Three/Anim.jsx';
+import Sky from './components/Three/Sky.jsx';
 import GolfBall from './components/Three/GolfBall.jsx';
-import { useMousePosition } from './utils/useMousePosition.jsx';
-import { useResize } from './utils/useResize.jsx';
-extend({ OrbitControls });
+import { Anim } from './components/Three/Anim.jsx';
 RectAreaLightUniformsLib.init()
 
-function AnimationCanvas() {
+
+extend({ OrbitControls });
+const CameraControls = () => {
+  const controls = useRef();
+  const { camera, gl: { domElement } } = useThree();
+  useFrame((state) => controls.current.update());
+  return (
+    <orbitControls
+      ref={controls}
+      args={[camera, domElement]}
+      enableZoom={true}
+      // maxAzimuthAngle={Math.PI / 4}
+      // maxPolarAngle={Math.PI}
+      minAzimuthAngle={-Math.PI / 4}
+      minPolarAngle={0}
+    />
+  );
+};
+
+function AnimationCanvas({canvas}) {
   return (
     <Canvas
-      camera={{position: [0, 2, 10], fov: 75}}
+      camera={{position: [0, 10, 50], fov: 75}}
+      ref={canvas}
     >
+      <CameraControls />
       <ambientLight />
-      <GolfBall />
-      <Anim />
+      <Physics gravity={[0, -2, 0]}>
+      <Sky />
+        <GolfBall />
+        <Anim />
+      </Physics>
     </Canvas>
   );
 }
 
 function App() {
+  let canvas = useRef();
   return (
     <AppContainer className="app">
       <GlobalStyle />
       <Container className="anim">
         <Suspense fallback={null}>
-          <AnimationCanvas />
+          <AnimationCanvas canvas={canvas}/>
         </Suspense>
       </Container>
     </AppContainer>

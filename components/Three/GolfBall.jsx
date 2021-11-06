@@ -1,12 +1,14 @@
 import React, { useState, useRef, useEffect } from 'react';
 import * as THREE from 'three';
 import { useFrame, useLoader } from '@react-three/fiber';
+import { useSphere } from '@react-three/cannon'
 import golfBall from '../../public/images/golf_ball.jpeg';
 import { useSpring, animated } from '@react-spring/three';
 
 function GolfBall(props) {
 
     const mesh = useRef();
+    const [ball] = useSphere(() => ({ mass: 1, position: [0, 5, 0], ...props }))
     const [ active, setActive ] = useState(false);
     const [ texture ] = useLoader(THREE.TextureLoader, [golfBall]);
 
@@ -45,8 +47,10 @@ function GolfBall(props) {
             onClick={() => setActive(Number(!active))}
             >
             {/* <pointLight position={[-10, 500, 100]} /> */}
-            <mesh>
-                <sphereBufferGeometry attach="geometry" args={[2, 64, 64]} />
+            <mesh 
+              ref={ball}
+            >
+                <sphereBufferGeometry attach="geometry" args={[1, 64, 64]} />
                 <meshStandardMaterial attach="material" map={texture}/>
             </mesh>
             {/* <Dolly /> */}
