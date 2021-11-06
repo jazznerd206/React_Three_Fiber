@@ -3,58 +3,34 @@ import * as THREE from 'three';
 import { useFrame, useLoader } from '@react-three/fiber';
 import { useSphere } from '@react-three/cannon'
 import golfBall from '../../public/images/golf_ball.jpeg';
-import { useSpring, animated } from '@react-spring/three';
 
 function GolfBall(props) {
 
     const mesh = useRef();
-    const [ball] = useSphere(() => ({ mass: 1, position: [0, 5, 0], ...props }))
-    const [ active, setActive ] = useState(false);
+    const [ball] = useSphere(() => ({ type: 'Static', args: [props.radius], mass: 1, position: [0, 25, 0], ...props }))
     const [ texture ] = useLoader(THREE.TextureLoader, [golfBall]);
 
     /**
      * ROTATE ANIMATION
      */
-    useFrame(({ clock }) => (mesh.current.rotation.x = mesh.current.rotation.y = mesh.current.rotation.z = Math.cos(clock.getElapsedTime() / 8) * Math.PI))
-
-    
-    /**
-     * SCALE ANIMATION ON CLICK
-     */
-    const { spring } = useSpring({
-        spring: active,
-        config: { mass: 5, tension: 400, friction: 50, precision: 0.01 },
-      })
-    const scale = spring.to([0, 1], [1, 2])
-    const rotation = spring.to([0, 1], [0, Math.PI])
-    const color = spring.to([0, 1], ['#6246ea', '#e45858']);
-
-    function Dolly() {
-        useFrame((state) => {
-          state.camera.position.z = 50 + Math.sin(state.clock.getElapsedTime()) * 30
-          state.camera.updateProjectionMatrix()
-        })
-        return null
-    }
+    useFrame(({ clock }) => {(
+      // api.position.set(0, 1.5, Math.sin(clock.getElapsedTime() / 3) * 2),
+      mesh.current.rotation.x = mesh.current.rotation.y = mesh.current.rotation.z = Math.cos(clock.getElapsedTime() / 8) * Math.PI)
+    })
     
   
     return (            
-        <animated.group 
-            ref={mesh} 
-            rotation-y={rotation} 
-            scale-x={scale} 
-            scale-z={scale} 
-            onClick={() => setActive(Number(!active))}
-            >
+        <group ref={mesh} >
             {/* <pointLight position={[-10, 500, 100]} /> */}
             <mesh 
               ref={ball}
+              castShadow={true}
             >
-                <sphereBufferGeometry attach="geometry" args={[1, 64, 64]} />
+                <sphereBufferGeometry attach="geometry" args={[props.radius, 64, 64]} />
                 <meshStandardMaterial attach="material" map={texture}/>
             </mesh>
             {/* <Dolly /> */}
-        </animated.group>
+        </group>
       )
   }
 

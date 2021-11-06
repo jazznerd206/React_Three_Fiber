@@ -24,6 +24,11 @@ const CameraControls = ({reference}) => {
         args={[camera, domElement]}
         autoRotate={true}
         enableZoom={false}
+        enableDamping
+        dampingFactor={0.2}
+        rotateSpeed={0.5}
+        minPolarAngle={Math.PI / 3}
+        maxPolarAngle={Math.PI / 3}
       />
     );
 };

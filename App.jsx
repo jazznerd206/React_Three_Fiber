@@ -8,6 +8,7 @@ import { AppContainer, Container } from './styled/els.styled.jsx';
 import Sky from './components/Three/Sky.jsx';
 import GolfBall from './components/Three/GolfBall.jsx';
 import { Anim } from './components/Three/Anim.jsx';
+import { Raycast } from './components/Three/Raycast.jsx';
 RectAreaLightUniformsLib.init()
 
 
@@ -37,10 +38,15 @@ function AnimationCanvas({canvas}) {
     >
       <CameraControls />
       <ambientLight />
-      <Physics gravity={[0, -2, 0]}>
       <Sky />
-        <GolfBall />
+      <Physics gravity={[0, -9.81, 10]}>
+        <GolfBall radius={.5}/>
+        <GolfBall radius={1}/>
+        <GolfBall radius={1.5}/>
+        <GolfBall radius={2}/>
+        <GolfBall radius={2.5}/>
         <Anim />
+        {/* <Raycast /> */}
       </Physics>
     </Canvas>
   );
