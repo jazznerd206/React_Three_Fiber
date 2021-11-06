@@ -12,11 +12,10 @@ export const AppContainer = styled.div`
 export const Container = styled.div`
     margin: 0;
     padding: 0;
-    background-color: black;
+    /* background-color: black; */
     display: flex;
     flex: 1;
     height: 100vh;
     width: 100vw;
-    pointer-events: all;
-    z-index: -1;
+    /* z-index: -1; */
 `

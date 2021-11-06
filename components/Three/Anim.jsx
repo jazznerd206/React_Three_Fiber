@@ -2,6 +2,7 @@ import { useFrame } from "@react-three/fiber";
 import React, { useMemo, useRef } from "react";
 import * as THREE from 'three';
 import { useLoader } from '@react-three/fiber';
+import noise, { simplex3 } from '../../utils/noise.js';
 import grass from '../../public/images/grass_green_d.jpg';
 import grass_bump from '../../public/images/grass_green_n.jpg';
 
@@ -71,7 +72,7 @@ function MeshAnim({
     useFrame(() => {
         t = update(t);
         previous = previous === undefined ? 0 : previous;
-        if (t < previous + .25) {
+        if (t < previous) {
             t = update(t);
             return
         } else {
@@ -130,7 +131,6 @@ function MeshAnim({
             <meshStandardMaterial
                 vertexColors
                 side={THREE.DoubleSide}
-                // wireframe={true}
                 // map={texture}
                 // bumpMap={bump}
                 // bump={.75}
@@ -142,21 +142,46 @@ function MeshAnim({
 
 export function Anim() {
 
-    const zOfXYT = (x,y,t) => {return Math.random()};
+    const seed = Math.floor(Math.random() * (2 ** 16))
+    noise.seed(seed)
+
+    const sampleNoise = (x, y, z) => {
+        let scale = 1 / 8
+        let octaves = 20
+        let persistence = .4
+        let lacunarity = 2
+
+        let amp = 1
+        let freq = 1
+
+        let value = 0
+        for (let i = 0; i < octaves; i++) {
+            value += amp * simplex3(x * freq * scale, y * freq * scale, z)
+            amp *= persistence
+            freq *= lacunarity
+        }
+
+        return value
+    }
+
+    const zOfXYT = (x, y, t) => {
+        return sampleNoise(x, y, t)
+    }
+
     const colorOfXYZT = (x,y,z,t) => {
         return {
-            r: Math.random(),
-            g: Math.random(),
-            b: Math.random(),
+            r: z ** 2 / 32,
+            g: z * Math.sqrt(z ** 2 + y * y) / 15,
+            b: Math.sqrt(x ** 2 + y ** 2) / 75,
         }
     }
     return (
         <MeshAnim 
-            position={[0, 0, -2]}
+            position={[0, -2, -2]}
             rotation={[-Math.PI / 2, 0, 0]}
             grid={{
-                width: 100,
-                height: 100,
+                width: 150,
+                height: 150,
                 dist: 0.2
             }}
             zOfXYT={zOfXYT}
