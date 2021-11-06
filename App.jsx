@@ -1,14 +1,19 @@
 import React, { Suspense, useState, useEffect, useRef } from 'react';
+import * as THREE from 'three';
 import { RectAreaLightUniformsLib } from 'three/examples/jsm/lights/RectAreaLightUniformsLib'
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls";
 import { Canvas, useThree, useFrame, extend } from '@react-three/fiber';
-import { Physics } from '@react-three/cannon'
+import { Physics } from '@react-three/cannon';
+import niceColors from 'nice-color-palettes'
 import GlobalStyle from './styled/global.styled.jsx';
 import { AppContainer, Container } from './styled/els.styled.jsx';
 import Sky from './components/Three/Sky.jsx';
 import GolfBall from './components/Three/GolfBall.jsx';
 import { Anim } from './components/Three/Anim.jsx';
+import { InstancedSpheres } from './components/Three/Ball.jsx';
 import { Raycast } from './components/Three/Raycast.jsx';
+import { Box } from './components/Three/Box.jsx';
+import { Plane } from './components/Three/Plane.jsx';
 RectAreaLightUniformsLib.init()
 
 
@@ -22,8 +27,8 @@ const CameraControls = () => {
       ref={controls}
       args={[camera, domElement]}
       enableZoom={true}
-      // maxAzimuthAngle={Math.PI / 4}
-      // maxPolarAngle={Math.PI}
+      maxAzimuthAngle={Math.PI / 4}
+      maxPolarAngle={Math.PI}
       minAzimuthAngle={-Math.PI / 4}
       minPolarAngle={0}
     />
@@ -31,22 +36,31 @@ const CameraControls = () => {
 };
 
 function AnimationCanvas({canvas}) {
+  const flag = Math.random();
   return (
     <Canvas
-      camera={{position: [0, 10, 50], fov: 75}}
+      camera={{position: [0, -50, 50], fov: 75}}
       ref={canvas}
     >
       <CameraControls />
-      <ambientLight />
-      <Sky />
-      <Physics gravity={[0, -9.81, 10]}>
-        <GolfBall radius={.5}/>
-        <GolfBall radius={1}/>
-        <GolfBall radius={1.5}/>
-        <GolfBall radius={2}/>
-        <GolfBall radius={2.5}/>
-        <Anim />
-        {/* <Raycast /> */}
+      <hemisphereLight intensity={1} color={new THREE.Color('rgb(249,215,28,.5)')} />
+      <pointLight position={[-30, 0, -30]} intensity={0.5} />
+      {/* <spotLight
+        position={[30, 0, 30]}
+        angle={0.7}
+        penumbra={1}
+        intensity={1}
+        castShadow
+        shadow-mapSize-width={256}
+        shadow-mapSize-height={256}
+      /> */}
+      <Physics  gravity={[0, 0, -500]}>
+        <Plane color={niceColors[21][4]} />
+        <Plane color={niceColors[21][1]} position={[-100, 0, 0]} rotation={[0, Math.PI / 2, 0]} />
+        <Plane color={niceColors[21][2]} position={[100, 0, 0]} rotation={[0, -Math.PI / 2, 0]} />
+        <Plane color={niceColors[21][3]} position={[0, 100, 0]} rotation={[Math.PI / 2, 0, 0]} />
+        <Plane color={niceColors[21][0]} position={[0, -100, 0]} rotation={[-Math.PI / 2, 0, 0]} />
+        <InstancedSpheres number={100} />
       </Physics>
     </Canvas>
   );
