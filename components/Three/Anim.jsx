@@ -15,6 +15,7 @@ function MeshAnim({
     zOfXYT,
     anim: {
         init,
+        previous,
         update
     }
 }) {
@@ -22,6 +23,7 @@ function MeshAnim({
     const [ texture, bump ] = useLoader(THREE.TextureLoader, [grass, grass_bump]);
 
     let t = init // time
+    // previous = previous === undefined ? init : previous;
 
     // vertex buffer
     let { positions, colors, normals } = useMemo(() => {
@@ -67,24 +69,29 @@ function MeshAnim({
     // animation
     let posRef = useRef(), colorRef = useRef()
     useFrame(() => {
-        t = update(t)
-
-        const positions = posRef.current.array, colors = colorRef.current.array
-
-        let i = 0
-        for (let yi = 0; yi < height; yi++) {
-            for (let xi = 0; xi < width; xi++) {
-                positions[i + 2] = zOfXYT(positions[i], positions[i + 1], t)
-                let c = colorOfXYZT(positions[i], positions[i + 1], positions[i + 2], t)
-                colors[i] = c.r
-                colors[i + 1] = c.g
-                colors[i + 2] = c.b
-                i += 3
+        t = update(t);
+        previous = previous === undefined ? 0 : previous;
+        if (t < previous + .25) {
+            t = update(t);
+            return
+        } else {
+            const positions = posRef.current.array, colors = colorRef.current.array
+    
+            let i = 0
+            for (let yi = 0; yi < height; yi++) {
+                for (let xi = 0; xi < width; xi++) {
+                    positions[i + 2] = zOfXYT(positions[i], positions[i + 1], t)
+                    let c = colorOfXYZT(positions[i], positions[i + 1], positions[i + 2], t)
+                    colors[i] = c.r
+                    colors[i + 1] = c.g
+                    colors[i + 2] = c.b
+                    i += 3
+                }
             }
+            previous = t;
+            posRef.current.needsUpdate = true;
+            colorRef.current.needsUpdate = true;
         }
-
-        posRef.current.needsUpdate = true;
-        colorRef.current.needsUpdate = true;
     })
 
 
@@ -124,10 +131,10 @@ function MeshAnim({
                 vertexColors
                 side={THREE.DoubleSide}
                 // wireframe={true}
-                map={texture}
-                bumpMap={bump}
-                bump={.75}
-                bumpScale={.75}
+                // map={texture}
+                // bumpMap={bump}
+                // bump={.75}
+                // bumpScale={.75}
             />
         </mesh>
     );
@@ -145,7 +152,7 @@ export function Anim() {
     }
     return (
         <MeshAnim 
-            position={[0, 0, 0]}
+            position={[0, 0, -2]}
             rotation={[-Math.PI / 2, 0, 0]}
             grid={{
                 width: 100,
