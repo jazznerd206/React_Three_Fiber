@@ -22,7 +22,7 @@ function MeshAnim({
 }) {
 
     const [ texture, bump ] = useLoader(THREE.TextureLoader, [grass, grass_bump]);
-    const [plane] = usePlane((props) => ({ rotation: [-Math.PI / 2, 0, 0], ...props }))
+    const [plane] = usePlane((props) => ({ rotation: [0, 0, 0], ...props }))
     let t = init // time
     // previous = previous === undefined ? init : previous;
 
@@ -77,22 +77,22 @@ function MeshAnim({
             return
         } else {
             const positions = posRef.current.array
-            const colors = colorRef.current.array
+            // const colors = colorRef.current.array
     
             let i = 0
             for (let yi = 0; yi < height; yi++) {
                 for (let xi = 0; xi < width; xi++) {
                     positions[i + 2] = zOfXYT(positions[i], positions[i + 1], t)
                     let c = colorOfXYZT(positions[i], positions[i + 1], positions[i + 2], t)
-                    colors[i] = c.r
-                    colors[i + 1] = c.g
-                    colors[i + 2] = c.b
+                    // colors[i] = c.r
+                    // colors[i + 1] = c.g
+                    // colors[i + 2] = c.b
                     i += 3
                 }
             }
             previous = t;
             posRef.current.needsUpdate = true;
-            colorRef.current.needsUpdate = true;
+            // colorRef.current.needsUpdate = true;
         }
     })
 
@@ -103,7 +103,9 @@ function MeshAnim({
             position={position}
             rotation={rotation}
         >
-            <bufferGeometry args={[8,8,64,64]}>
+            <hemisphereLight intensity={.25} />
+            <pointLight position={[-30, 0, -30]} intensity={0.5} />
+            <bufferGeometry args={[32,32,64,64]}>
                 <bufferAttribute
                     ref={posRef}
                     attachObject={['attributes', 'position']}
@@ -111,13 +113,13 @@ function MeshAnim({
                     count={positions.length / 3}
                     itemSize={3}
                 />
-                <bufferAttribute
+                {/* <bufferAttribute
                     ref={colorRef}
                     attachObject={['attributes', 'color']}
                     array={colors}
                     count={colors.length / 3}
                     itemSize={3}
-                />
+                /> */}
                 <bufferAttribute
                     attachObject={['attributes', 'normal']}
                     array={normals}
@@ -131,9 +133,13 @@ function MeshAnim({
                 />
             </bufferGeometry>
             <meshStandardMaterial
-                vertexColors
-                // wireframe={true}
+                // vertexColors
+                wireframe={false}
                 side={THREE.DoubleSide}
+                attach="material"
+                map={texture}
+                bumpMap={bump}
+                bump={.25}
             />
         </mesh>
     );
@@ -145,10 +151,10 @@ export function Anim() {
     noise.seed(seed)
 
     const sampleNoise = (x, y, z) => {
-        let scale = 1 / 8
-        let octaves = 20
-        let persistence = .4
-        let lacunarity = 2
+        let scale = 1 / 16
+        let octaves = 10
+        let persistence = .8
+        let lacunarity = 1
 
         let amp = 1
         let freq = 1
@@ -169,19 +175,19 @@ export function Anim() {
 
     const colorOfXYZT = (x,y,z,t) => {
         return {
-            r: z ** 2 / 32,
-            g: z * Math.sqrt(z ** 2 + y * y) / 15,
-            b: Math.sqrt(x ** 2 + y ** 2) / 75,
+            r: z * Math.sqrt(x ** 2 + y ** 2) / 75,
+            g: Math.sqrt(x ** 2 + y ** 2) / 50,
+            b: Math.sqrt(x ** 2 + y ** 2) / 25,
         }
     }
     return (
         <MeshAnim 
-            position={[0, -2, -2]}
+            position={[0, 0, 0]}
             rotation={[-Math.PI / 2, 0, 0]}
             grid={{
-                width: 100,
-                height: 100,
-                dist: .8
+                width: 25,
+                height: 25,
+                dist: 10
             }}
             zOfXYT={zOfXYT}
             colorOfXYZT={colorOfXYZT}

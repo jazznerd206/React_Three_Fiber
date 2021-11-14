@@ -6,7 +6,7 @@ import { useSphere } from '@react-three/cannon';
 import niceColors from 'nice-color-palettes';
 import golfBall from '../../public/images/golf_ball.jpeg';
 
-export function InstancedSpheres({ number = 1000 }) {
+export function InstancedSpheres({ number }) {
     const [ texture ] = useLoader(THREE.TextureLoader, [golfBall]);
     const [ref] = useSphere((index) => ({
       args: [3],

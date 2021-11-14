@@ -1,17 +1,33 @@
 const path = require('path');
+const NodePolyfillPlugin = require("node-polyfill-webpack-plugin")
 const MiniCssExtractPlugin = require("mini-css-extract-plugin");  
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 
 module.exports = {
+  mode: 'development',
   entry: {
     'bundle': './index.jsx',
     'bundle.min': '/index.jsx'
   },
+  output: {
+    path: path.resolve(__dirname, 'dist'),
+    filename: "[name].js",
+    clean: true,
+  },
+  plugins: [
+    new HtmlWebpackPlugin({
+      template: path.join(__dirname, 'public', 'index.html' ),
+      filename: 'index.html',
+      title: 'Webpack Development'
+    }),
+    new MiniCssExtractPlugin(),
+    new NodePolyfillPlugin(),
+  ],
   devtool: 'inline-source-map',
-  mode: 'development',
   devServer: {
     host: '0.0.0.0',
     port: 3000,
+    open: true,
     hot: true,
     proxy: {
       '/access': {
@@ -24,6 +40,11 @@ module.exports = {
   },
   module: {
     rules: [
+      // {
+      //   test: /\bjson\b/,
+      //   loader: 'json-loader',
+      //   exclude: /node_modules/,
+      // },
       {
         test: /\.(js|ts)x?$/,
         use: 'babel-loader',
@@ -48,18 +69,12 @@ module.exports = {
       {
         test: /\.(pdf|gif|png|jpe?g|svg)$/,
         use: 'file-loader?name=[path][name].[ext]',
-      }
+      },
+      
     ],
   },
   resolve: {
     extensions: ['.tsx', '.ts', '.js', '.jsx'],
   },
-  output: {
-    path: path.resolve(__dirname, 'dist'),
-    filename: "[name].js"
-  },
-  plugins: [
-    new HtmlWebpackPlugin({ template: path.join(__dirname, 'public', 'index.html' )}),
-    new MiniCssExtractPlugin()
-  ]
+  
 };

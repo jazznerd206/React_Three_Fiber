@@ -14,6 +14,9 @@ import { InstancedSpheres } from './components/Three/Ball.jsx';
 import { Raycast } from './components/Three/Raycast.jsx';
 import { Box } from './components/Three/Box.jsx';
 import { Plane } from './components/Three/Plane.jsx';
+import Text from './components/Three/Text.jsx';
+import Center from './components/Three/Center.jsx';
+import ShapeText from './components/Three/ShapeText.jsx';
 RectAreaLightUniformsLib.init()
 
 
@@ -27,40 +30,47 @@ const CameraControls = () => {
       ref={controls}
       args={[camera, domElement]}
       enableZoom={true}
-      maxAzimuthAngle={Math.PI / 4}
-      maxPolarAngle={Math.PI}
-      minAzimuthAngle={-Math.PI / 4}
       minPolarAngle={0}
+      maxPolarAngle={Math.PI * 0.5}
+      minAzimuthAngle={-Math.PI / 4}
+      maxAzimuthAngle={Math.PI / 4}
     />
   );
 };
 
 function AnimationCanvas({canvas}) {
+  const x = (15 + Math.random() * 30) * (Math.round(Math.random()) ? -1 : 1)
+  const y = -10 + Math.random() * 20
+  const z = -5 + Math.random() * 10
   const flag = Math.random();
   return (
     <Canvas
-      camera={{position: [0, -50, 50], fov: 75}}
+      camera={{position: [0, 18, 25]}}
       ref={canvas}
+      shadows={true}
     >
       <CameraControls />
-      <hemisphereLight intensity={1} color={new THREE.Color('rgb(249,215,28,.5)')} />
-      <pointLight position={[-30, 0, -30]} intensity={0.5} />
-      {/* <spotLight
-        position={[30, 0, 30]}
-        angle={0.7}
-        penumbra={1}
-        intensity={1}
-        castShadow
-        shadow-mapSize-width={256}
-        shadow-mapSize-height={256}
-      /> */}
+      <hemisphereLight intensity={.25} />
+      <pointLight position={[-30, 10, -30]} intensity={.75}  castShadow />
+      <pointLight position={[30, 10, -30]} intensity={.25}  castShadow/>
       <Physics  gravity={[0, 0, -500]}>
-        <Plane color={niceColors[21][4]} />
-        <Plane color={niceColors[21][1]} position={[-100, 0, 0]} rotation={[0, Math.PI / 2, 0]} />
-        <Plane color={niceColors[21][2]} position={[100, 0, 0]} rotation={[0, -Math.PI / 2, 0]} />
-        <Plane color={niceColors[21][3]} position={[0, 100, 0]} rotation={[Math.PI / 2, 0, 0]} />
-        <Plane color={niceColors[21][0]} position={[0, -100, 0]} rotation={[-Math.PI / 2, 0, 0]} />
-        <InstancedSpheres number={100} />
+              <spotLight
+                position={[0, 10, 25]}
+                distance={100}
+                angle={-.75}
+                decay={0}
+                penumbra={.1}
+                intensity={1}
+                color={niceColors[27][1]}
+                shadow-mapSize-width={1024}
+                shadow-mapSize-height={1024}
+                castShadow
+                />
+        <Center position={[0, 4,0]}/>
+        <Plane color={niceColors[27][1]} position={[0, 0, 0]} rotation={[-Math.PI / 2, 0, 0]} />
+        {/* <Plane color={niceColors[13][1]} position={[0, 10, -20]} rotation={[0, 0, 0]} /> */}
+        {/* <Plane color={niceColors[13][3]} position={[-25, 10, 0]} rotation={[0,  Math.PI / 2, 0]} /> */}
+        {/* <Plane color={niceColors[13][3]} position={[25, 10, 0]} rotation={[0,  -Math.PI / 2, 0]} /> */}
       </Physics>
     </Canvas>
   );
